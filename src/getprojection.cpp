@@ -16,7 +16,7 @@ vector<int> GetProjection::ProjectPixels(Mat &sheet_image, proj_axis axis_choice
     {
         black_pixel_proj.resize(sheet_image.rows);
         proj_occurences.resize(sheet_image.cols+1,0);
-        cout<<"sheet size "<<sheet_image.rows<<endl;
+//        cout<<"sheet size "<<sheet_image.rows<<endl;
 
         for(int i=0; i<sheet_image.rows; i++)
         {
@@ -60,7 +60,7 @@ vector<int> GetProjection::ProjectPixels(Mat &sheet_image, proj_axis axis_choice
     }
 
     median = distance(proj_occurences.begin(), max_element(proj_occurences.begin(),proj_occurences.end()));
-    cout<<"median "<<median<<endl;
+//    cout<<"median "<<median<<endl;
 
     return black_pixel_proj;
 
@@ -103,7 +103,6 @@ vector<RotatedRect> GetProjection::DetectEllipses(const Mat &threshold_output)
 
 	vector<pair < int,int > > start_stop;
 
-
 	/// Find contours
 	findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
@@ -124,7 +123,7 @@ vector<RotatedRect> GetProjection::DetectEllipses(const Mat &threshold_output)
 	}
 
 	int nr_contours= minEllipse.size() ;
-	cout<<"contours.size() "<<nr_contours <<endl;
+//	cout<<"contours.size() "<<nr_contours <<endl;
 
 	/// Draw contours + rotated rects + ellipses
 //	Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );

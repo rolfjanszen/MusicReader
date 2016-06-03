@@ -25,8 +25,6 @@ public:
     Note(int bar_location_, Mat image_): bar_location(bar_location_),image(image_){}
     vector<int> Xprojection; //along bar
 
-
-
     int X_median;
     int X_avg;
 
@@ -35,6 +33,17 @@ public:
     int bar_location;
     Mat image;
     vector<NoteSegment> sub_segments;
+};
+
+class ProcessingNote{
+
+};
+
+class PlayableNote{
+public :
+	int tone;
+	double duration;
+	int bar_location;
 };
 
 #endif // NOTE_H

@@ -18,6 +18,8 @@ void AnalyseScore::DecipherScore(Mat &sheet) //main fundtion
 
     FindPrevalantEllipse(sheet);
 
+	KNN.TrainKNN();
+
     IdNotes();
 
 }
@@ -113,11 +115,15 @@ void AnalyseScore::CreateBars(vector<int> &staves, Mat &sheet_img)
         if (staves[4] - staves[0] < bar_height)
 		 {
 			 new_bar.bar_segment=sheet_copy.rowRange( new_bar.y_loc_start-range,new_bar.y_loc_end+range);
+			 new_bar.avg_staff_distance = (staves[4] - staves[0])/4;
+			 new_bar.y_highest_staff = range;
 			 bars.push_back(new_bar);
 			 cout<<"staves "<<staves.size()<<endl;
 
 			if(staves.size() > 4)
 				staves.erase(staves.begin(),staves.begin()+4);
+
+
 //                     System.Console.WriteLine("staves {0}", staves.Length);
 //			 imshow(" new_bar.bar_segment ", new_bar.bar_segment);
 //			 waitKey();
@@ -146,7 +152,7 @@ void AnalyseScore::SegmentNotes()
 
     for(int i=0;i<bars.size();i++)
     {
-
+    	//TODO Move to bars
         cout<<"start_stave "<<bars[i].y_loc_start<<" "<<bars[i].y_loc_end<<endl;
 
 //        Mat bar_segment=sheet_copy.rowRange(start_stave-range,staves[i]+range);
@@ -214,40 +220,25 @@ void AnalyseScore::SegmentNotes()
 
 
 
-void CheckEllipse(Mat image)
+void  AnalyseScore::IdNotes()
 {
-
-	int edgeThresh = 1;
-	int lowThreshold;
-	int const max_lowThreshold = 100;
-	int ratio = 3;
-	int kernel_size = 3;
-
-	Mat detected_edges;
-	/// Reduce noise with a kernel 3x3
-	blur( image, detected_edges, Size(3,3) );
-
-	/// Canny detector
-	Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
-
-	imshow("detected_edges ",detected_edges);
-	waitKey();
-
-}
-
-void  AnalyseScore::IdNotes( )
-{
+	string dataLocation = "C:\\Users\\rjanszen\\workspace\\Readmusic\\data\\";
 	RNG rng(12345);
 	vector<Point2f> notes;
 	double thresh = 10;
 	float dimension_ratio =	note_widht/ note_height;
+	int trainImgDimensio =20;
+	int dataCount = 0;
+	KNN.TrainKNN();
 
 	for(vector<Bar>::iterator bar_it=bars.begin();bar_it != bars.end() ; bar_it++)
 	{
 		int notebar_tresh = round(bars[0].notes[0].image.rows/3);
-
+		vector<PlayableNote> music;
 		for(vector<Note>::iterator note_it = bar_it->notes.begin()+1 ; note_it !=  bar_it->notes.end(); note_it++ )
 		{
+
+			//TODO Move to notes
 			Mat segment_cpy;
 			Mat threshold_output;
 
@@ -259,238 +250,31 @@ void  AnalyseScore::IdNotes( )
 
 			for(unsigned int i=0; i<ellipses.size(); i++)
 			{
-				if(abs(dimension_ratio- ellipses[i].size.width/ ellipses[i].size.height)<1 &&abs( ellipses[i].size.width -note_widht) < 4 && abs( ellipses[i].size.height -note_height) < 4)
+
+				if(abs(dimension_ratio- ellipses[i].size.width/ ellipses[i].size.height) < 20 && abs( ellipses[i].size.width -note_widht) < 10 && abs( ellipses[i].size.height -note_height) < 10)
 				{
 
-					cout<<"ellipse "<<ellipses[i].center<<" sz "<<ellipses[i].size<<" a "<<ellipses[i].angle<<endl;
+					if(saveTrainData){
+						ostringstream convert;   // stream used for the conversion
+						convert << dataCount;      // insert the textual representation of 'Number' in the characters in the stream
+						string name = convert.str() +".png";
+						KNN.SaveLearnImage(segment_cpy,ellipses[i] ,dataLocation, name);
+					}
+//					const KNearest newknn = KNN.TrainKNN();
+//					write(&newknn,"knntree");
+//					newknn.
+					float result = KNN.EvalData(segment_cpy,ellipses[i]);
+					cout<<"result "<<result<<endl;
+					if(result == 1)
+					{
+						PlayableNote newNote;
 
-					notes.push_back(ellipses[i].center);
-					cout<<"not found : "<<ellipses[i].center<<endl;
-
-					Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-					// contour
-//					drawContours(segment_cpy, ellipses[i], i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-					// ellipse
-					ellipse(segment_cpy, ellipses[i], color, 2, 8 );
-					imshow("ellipse ",segment_cpy);
-					imshow("threshold_output ",threshold_output);
-					CheckEllipse(segment_cpy);
-					waitKey();
-					destroyWindow("ellipse ");
-
+					}
 				}
 			}
-
-		/// Detect edges using Threshold
-
-//			namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
-//			imshow( "Contours", drawing );
-//			waitKey();
-//			destroyWindow( "Contours");
 		}
 	}
+
+	cout<<"done ID notes"<<endl;
 }
-
-
-//vector<vector<Point2i > >  AnalyseScore::ClusterConvexHulls(vector<int> data){
-//
-//    vector<vector<Point2i > > clusters;
-//    int x_avg=0;
-//    int y_avg=0;
-//    int nr_clusters=0;
-//    int i=0;
-////int median =0;
-//    int median = GetMedian(data);
-//
-//
-//    cout<<"ClusterConvexHulls median "<<median<<endl;
-//    clusters.resize(nr_clusters+1);
-//    clusters[nr_clusters];
-//    for(int i=0; i < (data.size()) ;i++)
-//    {
-//        if(data[i]>0)
-//        {
-//            if(clusters[nr_clusters].size()<2)
-//                clusters[nr_clusters].push_back(Point2i(i,data[i]));
-//            else
-//            {
-//                x_avg=0;
-//                y_avg=0;
-//                int clust_sz=clusters[nr_clusters].size();
-//
-//                for(int k=0; k < clust_sz ;k++)
-//                {
-//                    x_avg+=clusters[nr_clusters][k].x;
-//                    y_avg+=clusters[nr_clusters][k].y;
-//
-//                }
-//
-//                x_avg /=(clust_sz);
-//                y_avg /=clust_sz;
-//
-//                bool in_convex_hull = true;
-//                cout<<"A (avg) "<<Point2i(x_avg, y_avg)<<" B "<<Point2i(i,data[i])<<endl;
-//
-//                for(int k=x_avg+1; k < clust_sz ;k++){
-//                    cout<<"M1 "<<clusters[nr_clusters][k]<<" M2 "<<clusters[nr_clusters][k-1]<<endl;
-//
-//                   bool convexity = CheckCross( clusters[nr_clusters][k-1],clusters[nr_clusters][k], Point2i(x_avg, y_avg), Point2i(i,data[i]));
-//                   if(!convexity || data[i]<=(median*1.1))
-//                   {
-//                       cout<<"lost convexity"<<endl;
-//                       in_convex_hull = false;
-//                   }
-//                }
-//
-//                if(in_convex_hull)
-//                {
-//                 clusters[nr_clusters].push_back(Point2i(i,data[i]));
-//                }
-//                else
-//                {
-//                    nr_clusters++;
-//                    clusters.resize(nr_clusters+1);
-//                    clusters[nr_clusters].reserve(data.size()-i);
-//                    clusters[nr_clusters].push_back(Point2i(i,data[i]));
-//
-//
-//                }
-//
-//            }
-//            }
-//
-//    }
-//
-//    cout<<"show cluseter"<<endl;
-//
-//    for(int i=0; i < (clusters.size()) ;i++){
-//        cout<<" (clusters[i].size() "<<clusters[i].size()<<endl;
-//        for(int j=0; j < (clusters[i].size()) ;j++)
-//            cout<<clusters[i][j]<<" ";
-//
-//        cout<<endl;
-//    }
-//
-//cout<<"done cluseter"<<endl;
-//    return clusters;
-//}
-//
-
-
-//
-//void AnalyseScore::IdNotes()
-//{
-//
-//    cout<<"IdNotes"<<endl;
-//
-//    GetProjection findYnoteproj;
-//
-//    Mat segment_cpy;
-//    int min_grade_length=2;
-//    int grad_tresh = 3;
-//
-//    vector<pair < int,int > > start_stop;
-//
-//    for(vector<Bar>::iterator bar_it=bars.begin();bar_it != bars.end() ; bar_it++){
-//
-//    	int notebar_tresh = bars[0].notes[0].image.rows/3;
-//
-//        cout<<"grad_tresh"<<grad_tresh<<endl;
-//        for(vector<Note>::iterator note_it = bar_it->notes.begin() ; note_it !=  bar_it->notes.end(); note_it++ )
-//        {
-//
-//            note_it->image.copyTo(segment_cpy);
-//
-//            findYnoteproj.PlotProjections(note_it->Xprojection,"Xprojection");
-//            vector<int> proj_Y = findYnoteproj.ProjectPixels(segment_cpy,Y_axis ,140 );
-//            cout<<"SmoothVector"<<endl;
-//            vector<int> smooth_proj= SmoothVector( note_it->Xprojection,  3);
-//            cout<<"PlotProjections"<<endl;
-//            findYnoteproj.PlotProjections(smooth_proj,"smooth_proj");
-//            cout<<"GetMedian"<<endl;
-//
-////            start_stop = FindROIRanges(smooth_proj, min_grade_length, grad_tresh);
-//            ClusterConvexHulls(smooth_proj);
-//
-//            cout<<"PlotProjections"<<endl;
-//
-////            findYnoteproj.PlotProjections(proj_Y,"proj_Y");
-//            cout<<"PlotProjections"<<endl;
-//
-////            findYnoteproj.PlotProjections(note_it->Xprojection,"proj x aaxis");
-//
-////            imshow("note_image",segment_cpy);
-////            waitKey();
-//
-//        }
-//    }
-//}
-
-
-//
-//vector<pair< int,int > > AnalyseScore::FindROIRanges(vector<int> data,  int min_grade_length, int grad_tresh){
-//
-//    int grade_changes=0, no_change=0;
-//
-//
-//    int start_X=0, end_X=0;
-//    bool tracking_note=false;
-//
-//    vector<pair< int,int > > start_stop;
-//    int prev_avg;
-//    int avg_grad;
-//    for(int i=0; i < (data.size()-1) ;i++)
-//    {
-//
-//        int prev_proj = data[i+1];
-//        int proj = data[i];
-//        avg_grad=0;
-//        for(int j=0;j<min_grade_length;j++)
-//            avg_grad -=(proj-prev_proj);
-//
-//        cout<<"abs diff: "<<(proj-prev_proj) <<" avg_grad "<<avg_grad<<"  @ "<<i<<endl;
-//
-//        if((avg_grad) > grad_tresh)
-//        {
-//            grade_changes++;
-//            no_change--;
-//            cout<<"finalize"<<endl;
-//            if(grade_changes>min_grade_length)
-//                grade_changes=min_grade_length;
-//            if(no_change<0)
-//                no_change=0;
-//        }
-//        else if((-avg_grad) > grad_tresh){
-//            grade_changes--;
-//            no_change++;
-//
-//            if(no_change>min_grade_length)
-//                no_change=min_grade_length;
-//            if(grade_changes<0)
-//                grade_changes=0;
-//
-//        }
-//
-//        if(grade_changes >= min_grade_length && !tracking_note)
-//        {
-//            no_change=0;
-//            start_X = i  - min_grade_length;
-//            tracking_note=true;
-//        }
-//        else if(no_change >= min_grade_length && tracking_note && avg_grad >=0 && prev_avg<0 && prev_avg >-3)
-//        {
-//            grade_changes=0;
-//            end_X=i-min_grade_length;
-//            tracking_note=false;
-//            cout<<"start : "<<start_X<<" end "<<end_X<<"  grade_changes "<<grade_changes<<" no change e "<<no_change<<endl;
-//
-//        }
-//
-//        prev_avg=avg_grad;
-//    }
-//
-//    return start_stop;
-//}
-//
-
 
