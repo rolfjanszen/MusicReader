@@ -12,13 +12,11 @@ class AnalyseScore
 
 public:
     AnalyseScore();
-    void DecipherScore(Mat &sheet);
-    bool saveTrainData;
+    void Run(Mat &sheet);
+
 
 private:
 	vector<Bar> bars;
-	GetProjection calcProj;
-	NoteRecogniser KNN;
 	float angle_bin;
 	Mat sheet_copy;
 	float note_angle, note_widht, note_height;

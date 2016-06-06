@@ -41,9 +41,8 @@ public:
 	   }
 
 	   cout<<"median_ "<<median_<<endl;
-
-
 	   return median_;
+
 	}
 
 	bool CheckCross( Point2i M1,Point2i M2, Point2i A, Point2i B);

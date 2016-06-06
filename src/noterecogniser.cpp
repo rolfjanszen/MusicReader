@@ -10,8 +10,11 @@
 NoteRecogniser::NoteRecogniser() {
 	// TODO Auto-generated constructor stub
 	trainImgDimension=20;
-	dilation_size =2;
+	dilation_size =1;
 	K = 10;
+
+	dataLocation = "C:\\Users\\rjanszen\\workspace\\Readmusic\\data\\";
+
 }
 
 NoteRecogniser::~NoteRecogniser() {
@@ -40,10 +43,6 @@ Mat NoteRecogniser::GetDataVec(string folder, vector<string> names, int dimensio
 	{
 
 		Mat goodimg = imread(folder+names[i],0);
-//		cout<<"name "<<folder+names[i]<<endl;
-//		imshow("goodimg ",goodimg);
-//		waitKey();
-//		cout<<"learn goodimg "<<goodimg<<endl;
 
 		Mat data=CreateVec(goodimg,dimension);
 		data.copyTo(Data.rowRange(i,i+1));
@@ -76,9 +75,11 @@ vector<string> NoteRecogniser::GetFileNames(string directory)
 	return filenames;
 }
 
-void NoteRecogniser::SaveLearnImage(Mat image, RotatedRect contour, string folder, string name){
+void NoteRecogniser::SaveLearnImage(Mat image, RotatedRect contour, string name){
+
+
 	Mat processedImg = PreProcessData(image,contour);
-	imwrite(folder+name,1);
+	imwrite(dataLocation +name,processedImg);
 
 }
 Mat NoteRecogniser::PreProcessData(const Mat &image,RotatedRect ellipse)
@@ -120,7 +121,8 @@ Mat NoteRecogniser::PreProcessData(const Mat &image,RotatedRect ellipse)
 	return erosion_dst.clone();
 }
 
-KNearest NoteRecogniser::TrainKNN()
+
+KNearest NoteRecogniser::Train()
 {
 	string goodDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\note\\";
 	string badDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\notnote\\";
@@ -150,56 +152,56 @@ KNearest NoteRecogniser::TrainKNN()
 	int K = 10;
 	TrainData.convertTo(TrainData,CV_32FC1);
 	KNearest newKNN(TrainData, TrainClassifier);
+	///////////
+   CvSVMParams params;
+	params.svm_type    = CvSVM::C_SVC;
+	params.kernel_type = CvSVM::LINEAR;
+	params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
 
+	// Train the SVM
+	CvSVM SVM;
+	SVM.train(TrainData, TrainClassifier, Mat(), Mat(), params);
+	//////////////////////
+	m_svm.train(TrainData, TrainClassifier, Mat(), Mat(), params);;
+	cout<<"TrainClassifier "<<TrainClassifier<<endl;
 //	newKNN.train(TrainData, TrainClassifier);
-	knn=newKNN;
-	cout<<"newKNN "<<newKNN.get_max_k()<<endl;
+//	knn=newKNN;
+//	cout<<"newKNN "<<newKNN.get_max_k()<<endl;
 	CvMat* nearests = cvCreateMat( 1, K, CV_32FC1);
 
 	for(unsigned int i=0;i<TrainData.rows;i++)
 	{
 		Mat test = TrainData.rowRange(i,i+1);
-		test.convertTo(test,CV_32FC1);
+//		test.convertTo(test,CV_32FC1);
 //		cout<<"test "<<test<<" "<<test.cols" "<<test.rows<<endl;
-		float response = newKNN.find_nearest(test,K);
+//		float response = newKNN.find_nearest(test,K);
+		 float response = SVM.predict(test);
 		cout<<"response "<<response<<endl;
 	}
-waitKey();
+
 	return newKNN;
 }
 
 
 float NoteRecogniser::EvalData(Mat image,RotatedRect ellipse)
 {
-	cout<<"knn "<<knn.get_max_k()<<endl;
-	KNearest newKNN(TrainData, TrainClassifier);
-//	cout<<"newKNN "<<newKNN.get_max_k()<<endl;
-
-//	cout<<"TrainClassifier "<<TrainClassifier<<endl;
 	imshow("image",image);
-	waitKey();
-	cout<<"here1 "<<endl;
+
+
 	Mat testImage = PreProcessData( image, ellipse);
 
 	cout<<"here postproc "<<endl;
-//	imshow("testImage",testImage);
-//	waitKey();
+	imshow("testImage",testImage);
+
+
 	int dimension = trainImgDimension*trainImgDimension;
 	Mat data=CreateVec(testImage, dimension);
-	cout<<"data befoire "<<data<<endl;
+
 	data.convertTo(data,CV_32FC1);
 
-	cout<<"data "<<data<<endl;
-	float response;
 
-//	try
-//	{
-		response = newKNN.find_nearest(data ,K);
-//	}
-//	catch(int e){
-//		cout<<"errror"<<endl;
-//		response=-1;
-//	}
+	float  response = m_svm.predict(data);
+
 	cout<<"response "<<response<<endl;
 	return response;
 
