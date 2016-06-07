@@ -1,10 +1,10 @@
 #ifndef ANALYSESCORE_H
 #define ANALYSESCORE_H
 
+#include <dataproc.h>
 #include "noterecogniser.h"
 
 #include "getprojection.h"
-#include "DataProc.h"
 #include "bar.h"
 
 class AnalyseScore

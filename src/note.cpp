@@ -6,6 +6,24 @@
 //
 //}
 
+void Note::OrderNotes(vector<PlayableNote>& input)
+{
+
+	PlayableNote temp;
+	for(unsigned int i2=0; i2 <= input.size(); i2++)
+	{
+		for(unsigned int j=0; j < input.size()-1; j++)
+		{
+			//Swapping element in if statement
+			if(input[j].bar_location > input[j+1].bar_location)
+			{
+				temp=input[j];
+				input[j]=input[j+1];
+				input[j+1]=temp;
+			}
+		}
+	}
+}
 
 vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser)
 {
@@ -19,9 +37,9 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 
 	vector<RotatedRect> ellipses = calcProj.DetectEllipses(threshold_output);
 	vector<PlayableNote> foundnotes;
+
 	for(unsigned int i=0; i<ellipses.size(); i++)
 	{
-
 		if(abs(med_dimension_ratio- ellipses[i].size.width/ ellipses[i].size.height) < 20 && abs( ellipses[i].size.width - med_note_widht) < 10 && abs( ellipses[i].size.height -med_note_height) < 10)
 		{
 
@@ -39,19 +57,29 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 			if(result == 1)
 			{
 				PlayableNote foundNote = GetNewTone(ellipses[i].center);
-				Mat cpy;
-				segment_cpy.copyTo(cpy);
-				//TODO order multiple notes found ...
 
-				circle(cpy,Point((int)ellipses[i].center.x,(int)ellipses[i].center.y), 5, Scalar(20,20,20) );
-				imshow("detected ",cpy);
-				foundnotes.push_back(foundNote);
-				cout<<"ided note "<<endl;
-				waitKey();
-				destroyWindow("detected");
+
+				if(foundNote.octave > 0 && foundNote.octave <5)
+				{
+					Mat cpy;
+					segment_cpy.copyTo(cpy);
+					circle(cpy,Point((int)ellipses[i].center.x,(int)ellipses[i].center.y), 5, Scalar(20,20,20) );
+					imshow("detected ",cpy);
+
+					foundnotes.push_back(foundNote);
+
+					cout<<"ided note "<<endl;
+					waitKey();
+					destroyWindow("detected");
+				}
+
 			}
 		}
 	}
+
+	if(foundnotes.size()>1)
+		OrderNotes(foundnotes);
+	///
 	return foundnotes;
 }
 

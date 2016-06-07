@@ -5,7 +5,7 @@
  *      Author: rjanszen
  */
 
-#include "DataProc.h"
+#include <dataproc.h>
 //
 //template<class T> DataProc<T>::DataProc() {
 //	// TODO Auto-generated constructor stub

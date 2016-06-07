@@ -8,5 +8,7 @@ int main(int argc, char *argv[])
 
     analyze.Run(sheetmusic);
 
+    //TODO simpleplayer
+
     return 0;
 }

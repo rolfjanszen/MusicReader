@@ -7,27 +7,19 @@
 #include <iostream>
 #include "noterecogniser.h"
 #include "getprojection.h"
+#include "playablenote.h"
 
 using namespace std;
 using namespace cv;
-
-class NoteSegment{
-public:
-    NoteSegment(){note=false;}
-    int start_x, start_y;
-    int stop_x, stop_y;
-    bool note;
-    Mat sub_I;
-};
-
-
-class PlayableNote{
-public :
-	int note_ID;
-	int octave;
-	double duration;
-	int bar_location;
-};
+//
+//class NoteSegment{
+//public:
+//    NoteSegment(){note=false;}
+//    int start_x, start_y;
+//    int stop_x, stop_y;
+//    bool note;
+//    Mat sub_I;
+//};
 
 class Note
 {
@@ -45,7 +37,7 @@ public:
 	//    int tone;
 	//    double duration;
 
-	vector<NoteSegment> sub_segments;
+//	vector<NoteSegment> sub_segments;
 
 
 private :
@@ -53,6 +45,7 @@ private :
 	bool saveTrainData;
 //	NoteRecogniser Identifier;
 	PlayableNote GetNewTone( Point2f center);
+	void OrderNotes(vector<PlayableNote>& input);
 	int bar_location;
 	Mat image;
 	float y_highest_staff;
