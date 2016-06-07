@@ -7,3 +7,4 @@ And also tone duration.
 
 
 
+![note reprsentation](note_reprsentation.jpg)
