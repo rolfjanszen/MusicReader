@@ -12,8 +12,7 @@ class AnalyseScore
 
 public:
     AnalyseScore();
-    void Run(Mat &sheet);
-
+    vector<Bar> Run(Mat &sheet);
 
 private:
 	vector<Bar> bars;

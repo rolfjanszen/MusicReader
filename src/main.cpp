@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
 
 	Mat sheetmusic=imread("C:\\Users\\rjanszen\\Documents\\free_sheet_music1.jpg",0);
 
-    analyze.Run(sheetmusic);
+   vector<Bar> playbar = analyze.Run(sheetmusic);
+
 
     //TODO simpleplayer
 
