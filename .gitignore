@@ -1,2 +1,9 @@
 Debug/
+build-*/
+.settings/
 
+*.pro
+*.pro.user
+.cproject
+.project
+knntree
