@@ -8,6 +8,7 @@ public :
 	double duration;
 	int bar_location;
 
+	PlayableNote(){}
   PlayableNote(int note_ID_, double duration_, int bar_location_) :
     note_ID(note_ID_),
     duration(duration_),

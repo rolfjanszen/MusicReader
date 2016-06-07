@@ -8,7 +8,7 @@ AnalyseScore::AnalyseScore()
 	angle_bin = 2;
 }
 
-void AnalyseScore::Run(Mat &sheet) //main fundtion
+vector<Bar> AnalyseScore::Run(Mat &sheet) //main fundtion
 {
     sheet_copy=sheet;
 
@@ -21,6 +21,7 @@ void AnalyseScore::Run(Mat &sheet) //main fundtion
 
     IdNotes();
 
+    return bars;
 }
 
 
@@ -56,7 +57,7 @@ void AnalyseScore::FindPrevalantEllipse(Mat &sheet)
     vector<int> Y_projections = findYproj.ProjectPixels(sheet_copy,Y_axis,210);
     int avg_Y_height=findYproj.GetAvarage();
 
-    findYproj.PlotProjections(Y_projections,"staves");
+//    findYproj.PlotProjections(Y_projections,"staves");
 
     cout<<"avg_Y_height "<<avg_Y_height<<endl;
     avg_Y_height*=2.5;
@@ -159,8 +160,13 @@ void  AnalyseScore::IdNotes()
 	Identifier.Train();
 
 	for(vector<Bar>::iterator bar_it=bars.begin();bar_it != bars.end() ; bar_it++)
+	for(int i=0;i<bars.size();i++)
 	{
-		bar_it->GetPlayableNotes(note_widht,note_height,note_counter, Identifier);
+		bool Fkey= false;
+		if(i%2 != 0)
+			Fkey = true;
+
+		bars[i].GetPlayableNotes(note_widht,note_height,note_counter, Identifier,Fkey);
 	}
 
 	cout<<"done ID notes"<<endl;

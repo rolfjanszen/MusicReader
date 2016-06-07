@@ -1,5 +1,5 @@
 #include "note.h"
-//#include "playablenotes.h"
+
 
 //Note::Note()
 //{
@@ -25,7 +25,7 @@ void Note::OrderNotes(vector<PlayableNote>& input)
 	}
 }
 
-vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser)
+vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey)
 {
 	//TODO Move to notes
 	Mat segment_cpy;
@@ -56,7 +56,7 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 
 			if(result == 1)
 			{
-				PlayableNote foundNote = GetNewTone(ellipses[i].center);
+				PlayableNote foundNote = GetNewTone(ellipses[i].center, Fkey);
 
 
 				if(foundNote.octave > 0 && foundNote.octave <5)
@@ -83,25 +83,58 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 	return foundnotes;
 }
 
+int noteRemap(int note)
+{
+	int notes_per_octave= 7;
+	int actual_notes_per_octave= 11;
+	int octave = round(note/notes_per_octave);
+cout<<"octave "<<octave<<endl;
+	note = note % notes_per_octave;
 
-PlayableNote Note::GetNewTone( Point2f center)
+	if(note > 1)
+		note ++;
+
+	if(note > 4)
+		note ++;
+
+	if(note > 6)
+		note ++;
+
+	if(note > 9)
+		note ++;
+
+	note += octave*actual_notes_per_octave;
+	cout<<"octave*actual_notes_per_octave; "<<octave*actual_notes_per_octave<<endl;
+
+	return note;
+
+}
+
+
+PlayableNote Note::GetNewTone( Point2f center, bool Fkey)
 {
 
 	PlayableNote new_note;
-	int highestOctave =2;
-	int notes_per_octave= 7;
+	int highestOctave = 2;
+	int startKey = 9;
 
-	float start_ = y_highest_staff - center.y;
+	if(Fkey)
+	{
+		startKey = 15;
+	}
+
+	float start_ =  center.y - y_highest_staff;
+	cout<<"start_ "<<start_<<endl;
 	float note_dist =  avg_staff_distance*0.5;
 	cout<<"note_dist "<<note_dist<<endl;
-	float half_staves_removed = highestOctave * notes_per_octave + (start_ /note_dist );
+	float half_staves_removed =  (start_ /note_dist );
 
-	new_note.note_ID = (int)((int)half_staves_removed) % notes_per_octave;//notes per octave
+	new_note.note_ID =  noteRemap(startKey + ((int)((int)half_staves_removed)) );//notes per octave
 	new_note.octave =highestOctave + (int)( start_/ (avg_staff_distance*4));
 	new_note.bar_location = bar_location + (int)center.x;
 	new_note.duration = 1;
 
-	cout<<"plabale note : @ "<<new_note.bar_location <<" id "<<new_note.note_ID<<" oc "<<	new_note.octave<<endl;
+	cout<<"plabale note : @ "<<new_note.bar_location <<" center.y "<<center.y<<" id "<<new_note.note_ID<<" oc "<<	new_note.octave<<endl;
 
 	return new_note;
 
