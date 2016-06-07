@@ -13,7 +13,7 @@ NoteRecogniser::NoteRecogniser() {
 	dilation_size =1;
 	K = 10;
 
-	dataLocation = "C:\\Users\\rjanszen\\workspace\\Readmusic\\data\\";
+	dataLocation = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\collecteded_data\\";
 
 }
 
@@ -124,8 +124,8 @@ Mat NoteRecogniser::PreProcessData(const Mat &image,RotatedRect ellipse)
 
 KNearest NoteRecogniser::Train()
 {
-	string goodDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\note\\";
-	string badDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\notnote\\";
+	string goodDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\note\\";
+	string badDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\notnote\\";
 
 	vector<string> goodNames = GetFileNames(goodDataLoc);
 	vector<string> badNames = GetFileNames(badDataLoc);

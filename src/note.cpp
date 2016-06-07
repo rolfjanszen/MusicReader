@@ -41,6 +41,8 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 				PlayableNote foundNote = GetNewTone(ellipses[i].center);
 				Mat cpy;
 				segment_cpy.copyTo(cpy);
+				//TODO order multiple notes found ...
+
 				circle(cpy,Point((int)ellipses[i].center.x,(int)ellipses[i].center.y), 5, Scalar(20,20,20) );
 				imshow("detected ",cpy);
 				foundnotes.push_back(foundNote);
