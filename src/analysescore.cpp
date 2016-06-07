@@ -159,8 +159,13 @@ void  AnalyseScore::IdNotes()
 	Identifier.Train();
 
 	for(vector<Bar>::iterator bar_it=bars.begin();bar_it != bars.end() ; bar_it++)
+	for(int i=0;i<bars.size();i++)
 	{
-		bar_it->GetPlayableNotes(note_widht,note_height,note_counter, Identifier);
+		bool Fkey= false;
+		if(i%2 != 0)
+			Fkey = true;
+
+		bars[i].GetPlayableNotes(note_widht,note_height,note_counter, Identifier,Fkey);
 	}
 
 	cout<<"done ID notes"<<endl;

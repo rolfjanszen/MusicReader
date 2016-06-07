@@ -25,7 +25,7 @@ void Note::OrderNotes(vector<PlayableNote>& input)
 	}
 }
 
-vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser)
+vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey)
 {
 	//TODO Move to notes
 	Mat segment_cpy;
@@ -56,7 +56,7 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 
 			if(result == 1)
 			{
-				PlayableNote foundNote = GetNewTone(ellipses[i].center);
+				PlayableNote foundNote = GetNewTone(ellipses[i].center, Fkey);
 
 
 				if(foundNote.octave > 0 && foundNote.octave <5)
@@ -84,11 +84,16 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 }
 
 
-PlayableNote Note::GetNewTone( Point2f center)
+PlayableNote Note::GetNewTone( Point2f center, bool Fkey)
 {
 
 	PlayableNote new_note;
-	int highestOctave =2;
+	int highestOctave = 2;
+	int startKey = 2;
+	if(Fkey){
+		startKey = 15;
+	}
+
 	int notes_per_octave= 7;
 
 	float start_ = y_highest_staff - center.y;
@@ -96,7 +101,7 @@ PlayableNote Note::GetNewTone( Point2f center)
 	cout<<"note_dist "<<note_dist<<endl;
 	float half_staves_removed = highestOctave * notes_per_octave + (start_ /note_dist );
 
-	new_note.note_ID = (int)((int)half_staves_removed) % notes_per_octave;//notes per octave
+	new_note.note_ID = (int)((int)half_staves_removed) + startKey;//notes per octave
 	new_note.octave =highestOctave + (int)( start_/ (avg_staff_distance*4));
 	new_note.bar_location = bar_location + (int)center.x;
 	new_note.duration = 1;

@@ -31,7 +31,7 @@ public:
 		bar_location(bar_location_),image(image_), y_highest_staff(highest_staff), avg_staff_distance(avg_bar_dist){}
 
 	vector<int> Xprojection; //along bar
-	vector<PlayableNote> FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser);
+	vector<PlayableNote> FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey);
 	int X_median;
 	int X_avg;
 	//    int tone;
@@ -44,7 +44,7 @@ private :
 	GetProjection calcProj;
 	bool saveTrainData;
 //	NoteRecogniser Identifier;
-	PlayableNote GetNewTone( Point2f center);
+	PlayableNote GetNewTone( Point2f center, bool Fkey);
 	void OrderNotes(vector<PlayableNote>& input);
 	int bar_location;
 	Mat image;
