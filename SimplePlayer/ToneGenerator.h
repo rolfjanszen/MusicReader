@@ -36,4 +36,6 @@ private:
 
 };
 
+void printNotes(const vector<PlayableNote>& notes);
+
 #endif // TONEGENERATOR_H

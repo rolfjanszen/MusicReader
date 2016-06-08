@@ -43,11 +43,6 @@ void ToneGenerator::play() const
 }
 
 
-
-// We call A4 note = 49.
-
-
-
 void ToneGenerator::vaderJacob()
 {
   double noteC =  pianoKeyFrequencies(40);

@@ -17,48 +17,40 @@ vector<PlayableNote> generateExampleNotes()
   int noteDuration  = 300;
 
   // Vader Jacob.
-  result.push_back(PlayableNote(13, noteDuration, 0));
-  result.push_back(PlayableNote(14, noteDuration, 0));
-  result.push_back(PlayableNote(15, noteDuration, 0));
-  result.push_back(PlayableNote(13, noteDuration, 0));
+  result.push_back(PlayableNote(40, noteDuration, 0));
+  result.push_back(PlayableNote(42, noteDuration, 0));
+  result.push_back(PlayableNote(44, noteDuration, 0));
+  result.push_back(PlayableNote(40, noteDuration, 0));
 
-  result.push_back(PlayableNote(13, noteDuration, 0));
-  result.push_back(PlayableNote(14, noteDuration, 0));
-  result.push_back(PlayableNote(15, noteDuration, 0));
-  result.push_back(PlayableNote(13, noteDuration, 0));
+  result.push_back(PlayableNote(40, noteDuration, 0));
+  result.push_back(PlayableNote(42, noteDuration, 0));
+  result.push_back(PlayableNote(44, noteDuration, 0));
+  result.push_back(PlayableNote(40, noteDuration, 0));
 
   // Slaapt gij nog?
-  result.push_back(PlayableNote(15, noteDuration, 0));
-  result.push_back(PlayableNote(16, noteDuration, 0));
-  result.push_back(PlayableNote(17, noteDuration * 2, 0));
+  result.push_back(PlayableNote(44, noteDuration, 0));
+  result.push_back(PlayableNote(45, noteDuration, 0));
+  result.push_back(PlayableNote(47, noteDuration * 2, 0));
 
-  result.push_back(PlayableNote(15, noteDuration, 0));
-  result.push_back(PlayableNote(16, noteDuration, 0));
-  result.push_back(PlayableNote(17, noteDuration * 2, 0));
+
+  result.push_back(PlayableNote(44, noteDuration, 0));
+  result.push_back(PlayableNote(45, noteDuration, 0));
+  result.push_back(PlayableNote(47, noteDuration * 2, 0));
 
   // Alle Klokken luiden
-  result.push_back(PlayableNote(17, noteDuration/2, 0));
-  result.push_back(PlayableNote(18, noteDuration/2, 0));
-  result.push_back(PlayableNote(17, noteDuration/2, 0));
-  result.push_back(PlayableNote(16, noteDuration/2, 0));
-  result.push_back(PlayableNote(15, noteDuration, 0));
-  result.push_back(PlayableNote(13, noteDuration, 0));
+  result.push_back(PlayableNote(47, noteDuration/2, 0));
+  result.push_back(PlayableNote(49, noteDuration/2, 0));
+  result.push_back(PlayableNote(47, noteDuration/2, 0));
+  result.push_back(PlayableNote(45, noteDuration/2, 0));
+  result.push_back(PlayableNote(44, noteDuration, 0));
+  result.push_back(PlayableNote(40, noteDuration, 0));
 
-  result.push_back(PlayableNote(17, noteDuration/2, 0));
-  result.push_back(PlayableNote(18, noteDuration/2, 0));
-  result.push_back(PlayableNote(17, noteDuration/2, 0));
-  result.push_back(PlayableNote(16, noteDuration/2, 0));
-  result.push_back(PlayableNote(15, noteDuration, 0));
-  result.push_back(PlayableNote(13, noteDuration, 0));
-
-  // Bim Bam Bom
-  result.push_back(PlayableNote(13, noteDuration, 0));
-  result.push_back(PlayableNote(10, noteDuration, 0));
-  result.push_back(PlayableNote(13, noteDuration*2, 0));
-
-  result.push_back(PlayableNote(13, noteDuration, 0));
-  result.push_back(PlayableNote(10, noteDuration*2, 0));
-  result.push_back(PlayableNote(13, noteDuration*4, 0));
+  result.push_back(PlayableNote(47, noteDuration/2, 0));
+  result.push_back(PlayableNote(49, noteDuration/2, 0));
+  result.push_back(PlayableNote(47, noteDuration/2, 0));
+  result.push_back(PlayableNote(45, noteDuration/2, 0));
+  result.push_back(PlayableNote(44, noteDuration, 0));
+  result.push_back(PlayableNote(40, noteDuration, 0));
 
   return result;
 
@@ -81,6 +73,8 @@ int main(int argc, char *argv[])
 
   cout<<"CAUTION! This program plays sound!"<<endl;
   system("pause");
+
+  musicPlayer->printNotes(song);
 
 
   musicPlayer->playNotes(song);

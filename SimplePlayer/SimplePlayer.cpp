@@ -1,9 +1,12 @@
 #include "SimplePlayer.h"
 
+#include <iostream>
+#include <string>
 
 SimplePlayer::SimplePlayer() :
   Player(),
   _toneGenerator()
+
 {
 }
 

@@ -2,6 +2,7 @@
 #define SIMPLEPLAYER_H
 
 #include <vector>
+#include <string>
 
 // Inlcudes from the MusicReader.
 
@@ -16,9 +17,9 @@ public:
   SimplePlayer();
 
   void playNotes(const vector<PlayableNote>& notes);
-
 private:
   ToneGenerator _toneGenerator;
+
 };
 
 #endif // SIMPLEPLAYER_H
