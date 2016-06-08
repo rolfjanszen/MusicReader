@@ -11,7 +11,7 @@ void SimplePlayer::playNotes(const vector<PlayableNote>& notes)
 {
   _toneGenerator.readNotes(notes);
 
-  //_toneGenerator.play();
+  _toneGenerator.play();
 
-  _toneGenerator.vaderJacob();
+  //_toneGenerator.vaderJacob();
 }
