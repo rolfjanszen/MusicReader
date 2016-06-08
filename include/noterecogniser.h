@@ -19,14 +19,14 @@ class NoteRecogniser {
 public:
 	NoteRecogniser();
 	virtual ~NoteRecogniser();
-	KNearest Train();
+	void Train();
 
 	float EvalData(Mat image,RotatedRect ellipse);
 	void SaveLearnImage(Mat image, RotatedRect contour,  string name);
 private :
 	Mat TrainData, TrainClassifier;
-
-	int K;
+	int dataDimension;
+//	int K;
 	int trainImgDimension;
 	int dilation_size;
 	string dataLocation;
@@ -34,7 +34,8 @@ private :
 	Mat GetDataVec(string folder, vector<string> names, int dimension);
 	vector<string> GetFileNames(string directory);
 	void ConcatData(Mat &trainData, Mat &classifier, const string datafolder, float id);
-	KNearest knn;
+	Mat GetDescriptor(Mat image);
+//	KNearest knn;
 	CvSVM m_svm;
 };
 

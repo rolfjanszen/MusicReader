@@ -57,10 +57,10 @@ void AnalyseScore::FindPrevalantEllipse(Mat &sheet)
     vector<int> Y_projections = findYproj.ProjectPixels(sheet_copy,Y_axis,210);
     int avg_Y_height=findYproj.GetAvarage();
 
-//    findYproj.PlotProjections(Y_projections,"staves");
+    findYproj.PlotProjections(Y_projections,"staves");
 
     cout<<"avg_Y_height "<<avg_Y_height<<endl;
-    avg_Y_height*=2.5;
+    avg_Y_height*=3;
 
     vector<int> staves;
 
@@ -72,7 +72,7 @@ void AnalyseScore::FindPrevalantEllipse(Mat &sheet)
 
         if(Y_projections[i]>avg_Y_height)
         {
-            cout<<"found staff "<<endl;
+//            cout<<"found staff "<<endl;
             if(Y_projections[i] > top_height)
             {
                 top_height=Y_projections[i];
@@ -81,18 +81,18 @@ void AnalyseScore::FindPrevalantEllipse(Mat &sheet)
         }
         else
         {
-            if(top_height>0 && top_height > Y_projections[top_index -1] && top_height > Y_projections[top_index +1]){
+            if(top_height>0 && top_height >( Y_projections[top_index -1] ||  Y_projections[top_index -2] )&& top_height > (Y_projections[top_index +1] ||Y_projections[top_index +2])){
 
                 staves.push_back(top_index);
                 staff_counter++;
                 cout<<"new staff @ "<<   top_index<<endl;
             }
-
             top_height=0;
         }
     }
 
     cout<<"staff_counter "<<   staff_counter<<endl;
+//    waitKey();
     return staves;
 }
 
@@ -103,8 +103,8 @@ void AnalyseScore::CreateBars(vector<int> &staves, Mat &sheet_img)
 
     while(staves.size()>=4){
 
-        int bar_height= 25;//staves[4]-staves[0];
-        int range=bar_height/1.5;
+        float bar_height= 30;//staves[4]-staves[0];
+        float range=bar_height/1.5;
 
         Bar new_bar;
         new_bar.y_loc_start=staves[0];
@@ -113,21 +113,22 @@ void AnalyseScore::CreateBars(vector<int> &staves, Mat &sheet_img)
         for(int i=0;i<5;i++)
             new_bar.staves[i]=staves[i];
 
-        if (staves[4] - staves[0] < bar_height)
+        if (staves[4] - staves[0] < (int)bar_height)
 		 {
-			 new_bar.bar_segment=sheet_copy.rowRange( new_bar.y_loc_start-range,new_bar.y_loc_end+range);
-			 new_bar.avg_staff_distance = (staves[4] - staves[0])/4;
+			 new_bar.bar_segment=sheet_copy.rowRange( new_bar.y_loc_start-(int)range,new_bar.y_loc_end+(int)range);
+			 new_bar.avg_staff_distance = ((float)(staves[4] - staves[0]))/4;
 			 new_bar.y_highest_staff = range;
 			 bars.push_back(new_bar);
 			 cout<<"staves "<<staves.size()<<endl;
 
-			if(staves.size() > 4)
-				staves.erase(staves.begin(),staves.begin()+4);
 
+			if(staves.size() > 4){
+				staves.erase(staves.begin(),staves.begin()+4);
+				imshow("bar_it ", new_bar.bar_segment);
+			}
 		 }
 		 else
 			 staves.erase(staves.begin());
-
 
         cout<<"staves "<<staves.size()<<endl;
 
@@ -155,18 +156,22 @@ void AnalyseScore::SegmentNotes()
 
 void  AnalyseScore::IdNotes()
 {
-	int note_counter = 0;
+
+	int note_counter = 100;
 	NoteRecogniser Identifier;
 	Identifier.Train();
 
 	for(vector<Bar>::iterator bar_it=bars.begin();bar_it != bars.end() ; bar_it++)
-	for(int i=0;i<bars.size();i++)
 	{
-		bool Fkey= false;
-		if(i%2 != 0)
-			Fkey = true;
+		imshow("bar_it ",bar_it->bar_segment);
+		for(int i=0;i<bars.size();i++)
+		{
+			bool Fkey= false;
+			if(i%2 != 0)
+				Fkey = true;
 
-		bars[i].GetPlayableNotes(note_widht,note_height,note_counter, Identifier,Fkey);
+			bars[i].GetPlayableNotes(note_widht,note_height,note_counter, Identifier,Fkey);
+		}
 	}
 
 	cout<<"done ID notes"<<endl;

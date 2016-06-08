@@ -9,12 +9,12 @@
 
 NoteRecogniser::NoteRecogniser() {
 	// TODO Auto-generated constructor stub
-	trainImgDimension=20;
+	trainImgDimension=32;
 	dilation_size =1;
-	K = 10;
+//	K = 10;
 
-	dataLocation = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\collecteded_data\\";
-
+	dataLocation = "traindata\\collecteded_data\\";
+	dataDimension = trainImgDimension*trainImgDimension;
 }
 
 NoteRecogniser::~NoteRecogniser() {
@@ -39,13 +39,15 @@ Mat NoteRecogniser::GetDataVec(string folder, vector<string> names, int dimensio
 	Mat Data(names.size(),dimension,CV_8UC1);
 //	Mat badData(dimension, names.size(),CV_8UC1);
 
-	for(int i=2;i < names.size();i++)
+	for(unsigned int i=2;i < names.size();i++)
 	{
 
 		Mat goodimg = imread(folder+names[i],0);
 
-		Mat data=CreateVec(goodimg,dimension);
-		data.copyTo(Data.rowRange(i,i+1));
+		Mat description = GetDescriptor(goodimg);
+		cout<<"description "<<description<<endl;
+//		Mat data=CreateVec(description,dimension);
+		description.copyTo(Data.rowRange(i,i+1));
 //		cout<<"learn data "<<Data.rowRange(i,i+1)<<endl;
 
 	}
@@ -77,58 +79,88 @@ vector<string> NoteRecogniser::GetFileNames(string directory)
 
 void NoteRecogniser::SaveLearnImage(Mat image, RotatedRect contour, string name){
 
-
-	Mat processedImg = PreProcessData(image,contour);
-	imwrite(dataLocation +name,processedImg);
+	Mat procesed = PreProcessData(image,contour);
+	imwrite(dataLocation +name,procesed);
 
 }
+
+Mat NoteRecogniser::GetDescriptor(Mat image)
+{
+
+	if(image.cols != trainImgDimension)
+	resize(image,image,Size(trainImgDimension,trainImgDimension),0,0,INTER_NEAREST);
+
+
+	Mat element = getStructuringElement( MORPH_ELLIPSE,
+											Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+											Point( dilation_size, dilation_size ) );
+
+	 Mat erosion_dst;
+//	         resize(trainImage,resizedImage,Size(trainImgDimension,trainImgDimension),0,0,INTER_NEAREST);
+	 dilate( image, image, element );
+	 erode( image, erosion_dst, element );
+
+
+//	HOGDescriptor  Hog( Size(32,32), Size(16,16), Size(8,8), Size(8,8), 9);
+//	vector<float> descriptors;
+//	vector<Point>locs;
+//
+//	Hog.compute(erosion_dst, descriptors);
+//	cout<<"fl "<<descriptors.size()<<endl;
+//	for(float &fl : descriptors)
+//		cout<<fl<<" ";
+//	Mat hogVector = Mat(1,descriptors.size(),CV_32FC1);
+//	 memcpy(hogVector.data,descriptors.data(),descriptors.size()*sizeof(float));
+//	 cout<<"hogVector "<<hogVector<<endl;
+//	 hogVector*=100;
+
+	return  CreateVec(erosion_dst , trainImgDimension*trainImgDimension);//hogVector.clone();
+
+}
+
 Mat NoteRecogniser::PreProcessData(const Mat &image,RotatedRect ellipse)
 {
-	int margin = 2;
+//	int margin = 0.2;
 	int cutsize;
 
 	if(ellipse.size.width > ellipse.size.height)
 		cutsize = (int)ellipse.size.width;
 	else
 		cutsize = (int) ellipse.size.height;
-
+	 int margin =cutsize*0.4;
 	int leftCol  = (int)ellipse.center.x - cutsize/2 - margin;
 	int rightCol = (int)ellipse.center.x + cutsize/2 + margin;
 	int topRow = (int)ellipse.center.y - cutsize/2 - margin;
 	int bottomRow  =(int) ellipse.center.y + cutsize/2 + margin;
-	Mat dilation_dst,erosion_dst;
+
+	Mat processedImage;
 	cout<<"PreProcessData"<<endl;
 
 	if(leftCol > 0  && rightCol < image.cols && topRow >0 && bottomRow <image.rows)
 	{
 		Mat trainImage = image.rowRange(topRow, bottomRow ).colRange(leftCol, rightCol);
 
-		Mat element = getStructuringElement( MORPH_ELLIPSE,
-											   Size( 2*dilation_size + 1, 2*dilation_size+1 ),
-											   Point( dilation_size, dilation_size ) );
+		resize(trainImage,processedImage,Size(trainImgDimension,trainImgDimension),0,0,INTER_NEAREST);
 
-		Mat resizedImage;
-		resize(trainImage,resizedImage,Size(trainImgDimension,trainImgDimension),0,0,INTER_NEAREST);
-
-		dilate( resizedImage, dilation_dst, element );
-		erode( dilation_dst, erosion_dst, element );
 	}
 	else
-		erosion_dst = Mat::ones(trainImgDimension,trainImgDimension,CV_8UC1);
+		processedImage = Mat::ones(trainImgDimension,trainImgDimension,CV_8UC1);
 
-	cout<<"done PreProcessData"<<endl;
+//	cout<<"done PreProcessData"<<processedImage<<endl;
 
-	return erosion_dst.clone();
+	return processedImage.clone();
 }
 
 void NoteRecogniser::ConcatData(Mat &trainData, Mat &classifier, const string datafolder, float id){
 
 	vector<string> names = GetFileNames(datafolder);
 	Mat goodimg = imread(datafolder+names[2],0);
-	int dimension = trainImgDimension*trainImgDimension;
+
+	int dimension = dataDimension;//trainImgDimension*trainImgDimension;
 	Mat data= GetDataVec(datafolder,names, dimension);
 
 	Mat new_classifier = Mat(data.rows,1,CV_32FC1,id);
+
 	if(trainData.empty())
 	{
 		data.copyTo(trainData);
@@ -143,20 +175,15 @@ void NoteRecogniser::ConcatData(Mat &trainData, Mat &classifier, const string da
 
 
 
-KNearest NoteRecogniser::Train()
+void NoteRecogniser::Train()
 {
+
 	int nrClasses = 3;
-	string goodDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\note\\";
-	string badDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\notnote\\";
-	string quarter = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\quarter\\";
+	string goodDataLoc = "traindata\\note\\";
+	string badDataLoc = "traindata\\notnote\\";
+	string quarter = "traindata\\quarter\\";
 
 	string nameArr[nrClasses]={goodDataLoc,badDataLoc,quarter};
-//
-//	for( int i=0;i<nrClasses;i++)
-//	{
-//		ConcatData(Mat &trainData, Mat &classifier, const string datafolder, float id)
-//	}
-
 
 	vector<string> goodNames = GetFileNames(goodDataLoc);
 	vector<string> badNames = GetFileNames(badDataLoc);
@@ -166,7 +193,7 @@ KNearest NoteRecogniser::Train()
 //	Mat badimg = imread(goodDataLoc+badNames[2],0);
 
 //	assert(goodimg.cols == badimg.cols && goodimg.rows == badimg.rows && goodimg.cols == goodimg.rows);
-	int dimension = trainImgDimension*trainImgDimension;
+	int dimension =dataDimension;// trainImgDimension*trainImgDimension;
 
 //	Mat goodData(dimension, goodNames.size(),CV_8UC1);
 //	Mat badData(dimension, badNames.size(),CV_8UC1);
@@ -174,7 +201,7 @@ KNearest NoteRecogniser::Train()
 	Mat goodData= GetDataVec(goodDataLoc,goodNames, dimension);
 	Mat badData= GetDataVec(badDataLoc,badNames, dimension);
 
-	Mat goodclass = Mat::ones(goodData.rows,1,CV_32FC1);
+	Mat goodclass = Mat(goodData.rows,1,CV_32FC1,1);
 	Mat badclass = Mat(badData.rows,1,CV_32FC1,2);
 
 	Mat trainImg, trainClass;
@@ -183,10 +210,11 @@ KNearest NoteRecogniser::Train()
 	trainImg.copyTo(TrainData);
 	trainClass.copyTo(TrainClassifier);
 
-	int K = 10;
+//	int K = 10;
 	TrainData.convertTo(TrainData,CV_32FC1);
-	KNearest newKNN(TrainData, TrainClassifier);
+//	KNearest newKNN(TrainData, TrainClassifier);
 	///////////
+
    CvSVMParams params;
 	params.svm_type    = CvSVM::C_SVC;
 	params.kernel_type = CvSVM::LINEAR;
@@ -201,7 +229,7 @@ KNearest NoteRecogniser::Train()
 //	newKNN.train(TrainData, TrainClassifier);
 //	knn=newKNN;
 //	cout<<"newKNN "<<newKNN.get_max_k()<<endl;
-	CvMat* nearests = cvCreateMat( 1, K, CV_32FC1);
+//	CvMat* nearests = cvCreateMat( 1, K, CV_32FC1);
 
 	for(unsigned int i=0;i<TrainData.rows;i++)
 	{
@@ -213,7 +241,7 @@ KNearest NoteRecogniser::Train()
 		cout<<"response "<<response<<endl;
 	}
 
-	return newKNN;
+//	return SVM;
 }
 
 
@@ -224,12 +252,11 @@ float NoteRecogniser::EvalData(Mat image,RotatedRect ellipse)
 
 	Mat testImage = PreProcessData( image, ellipse);
 
+	Mat data = GetDescriptor(testImage);
 	cout<<"here postproc "<<endl;
 	imshow("testImage",testImage);
 
-
-	int dimension = trainImgDimension*trainImgDimension;
-	Mat data=CreateVec(testImage, dimension);
+//	Mat data=CreateVec(description, dimension);
 
 	data.convertTo(data,CV_32FC1);
 

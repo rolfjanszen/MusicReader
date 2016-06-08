@@ -25,13 +25,17 @@ class Note
 {
 public:
 
-	Note(){}
+	Note(){
+		saveTrainData = true;
+	}
 
 	Note(int bar_location_, Mat image_, float &avg_bar_dist, float &highest_staff) :
-		bar_location(bar_location_),image(image_), y_highest_staff(highest_staff), avg_staff_distance(avg_bar_dist){}
+		bar_location(bar_location_),image(image_), y_highest_staff(highest_staff), avg_staff_distance(avg_bar_dist){
+		saveTrainData = true;
+	}
 
 	vector<int> Xprojection; //along bar
-	vector<PlayableNote> FindGoodTones(int dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey);
+	vector<PlayableNote> FindGoodTones(int & dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey);
 	int X_median;
 	int X_avg;
 	//    int tone;

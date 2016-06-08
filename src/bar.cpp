@@ -16,13 +16,12 @@ void Bar::WriteNote(const int range_start, const int range_end, const vector<int
 void Bar::GetPlayableNotes(const int note_widht , const int note_height, int &dataCount ,NoteRecogniser &Identifier, bool Fkey )
 {
 
-	RNG rng(12345);
+//	RNG rng(12345);
 //	vector<Point2f> notes;
-	double thresh = 10;
+	double thresh = 50;
 	float dimension_ratio =	note_widht/ note_height;
 
-
-	for(vector<Note>::iterator note_it = notes.begin(); note_it !=  notes.end(); note_it++ )
+	for(vector<Note>::iterator note_it = notes.begin()+3; note_it !=  notes.end(); note_it++ )
 	{
 		vector<PlayableNote> foundNotes = note_it->FindGoodTones( dataCount,  thresh,  dimension_ratio,  note_widht, note_height,Identifier,Fkey);
 
@@ -32,7 +31,6 @@ void Bar::GetPlayableNotes(const int note_widht , const int note_height, int &da
 			dataCount++;
 		}
 	}
-
 }
 
 void Bar::GetNoteSegment(int note_staff, const int margin_note)
