@@ -3,8 +3,6 @@
 
 #include <vector>
 
-//#include "../include/playablenote.h"
-
 using namespace std;
 
 // Forward declarations.

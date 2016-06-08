@@ -4,7 +4,6 @@
 #include <vector>
 
 // Inlcudes from the MusicReader.
-//#include "../include/playablenote.h"
 
 // Own inlcudes.
 #include "Player.h"

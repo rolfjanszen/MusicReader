@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 struct BeepStruct
 {
   double frequency;
@@ -17,6 +18,7 @@ struct BeepStruct
     duration(d)
   {}
 };
+
 
 class ToneGenerator
 {
