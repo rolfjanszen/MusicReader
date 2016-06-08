@@ -33,6 +33,7 @@ private :
 	Mat PreProcessData(const Mat &image,RotatedRect ellipse);
 	Mat GetDataVec(string folder, vector<string> names, int dimension);
 	vector<string> GetFileNames(string directory);
+	void ConcatData(Mat &trainData, Mat &classifier, const string datafolder, float id);
 	KNearest knn;
 	CvSVM m_svm;
 };

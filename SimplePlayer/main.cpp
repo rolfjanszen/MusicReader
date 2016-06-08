@@ -70,27 +70,27 @@ vector<PlayableNote> generateExampleNotes()
     */
 }
 
-int main(int argc, char *argv[])
-{
-  Player* musicPlayer;
-
-  musicPlayer = new SimplePlayer();
-
-  // Generate PlayableNotes vector.
-  vector<PlayableNote> song = generateExampleNotes();
-
-  cout<<"CAUTION! This program plays sound!"<<endl;
-  system("pause");
-
-
-  musicPlayer->playNotes(song);
-
-
-
-  delete musicPlayer;
-
-  return 0;
-}
-
-
+//int main(int argc, char *argv[])
+//{
+//  Player* musicPlayer;
+//
+//  musicPlayer = new SimplePlayer();
+//
+//  // Generate PlayableNotes vector.
+//  vector<PlayableNote> song = generateExampleNotes();
+//
+//  cout<<"CAUTION! This program plays sound!"<<endl;
+////  system("pause");
+//
+//
+//  musicPlayer->playNotes(song);
+//
+//
+//
+//  delete musicPlayer;
+//
+//  return 0;
+//}
+//
+//
 

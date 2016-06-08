@@ -37,7 +37,7 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 
 	vector<RotatedRect> ellipses = calcProj.DetectEllipses(threshold_output);
 	vector<PlayableNote> foundnotes;
-
+	double duration = 1000;
 	for(unsigned int i=0; i<ellipses.size(); i++)
 	{
 		if(abs(med_dimension_ratio- ellipses[i].size.width/ ellipses[i].size.height) < 20 && abs( ellipses[i].size.width - med_note_widht) < 10 && abs( ellipses[i].size.height -med_note_height) < 10)
@@ -53,24 +53,25 @@ vector<PlayableNote> Note::FindGoodTones(int dataCount, double tresh, int med_di
 
 			float result = recogniser.EvalData(segment_cpy,ellipses[i]);
 			cout<<"result "<<result<<endl;
-
+			if(result == 2)
+				duration = 500;
 			if(result == 1)
 			{
-				PlayableNote foundNote = GetNewTone(ellipses[i].center, Fkey);
+				PlayableNote foundNote = GetNewTone(ellipses[i].center, Fkey,duration);
 
 
-				if(foundNote.octave > 0 && foundNote.octave <5)
+				if(foundNote.note_ID > 0 && foundNote.note_ID < 64)
 				{
 					Mat cpy;
 					segment_cpy.copyTo(cpy);
-					circle(cpy,Point((int)ellipses[i].center.x,(int)ellipses[i].center.y), 5, Scalar(20,20,20) );
-					imshow("detected ",cpy);
+//					circle(cpy,Point((int)ellipses[i].center.x,(int)ellipses[i].center.y), 5, Scalar(20,20,20) );
+//					imshow("detected ",cpy);
 
 					foundnotes.push_back(foundNote);
 
 					cout<<"ided note "<<endl;
-					waitKey();
-					destroyWindow("detected");
+//					waitKey();
+//					destroyWindow("detected");
 				}
 
 			}
@@ -111,7 +112,7 @@ cout<<"octave "<<octave<<endl;
 }
 
 
-PlayableNote Note::GetNewTone( Point2f center, bool Fkey)
+PlayableNote Note::GetNewTone( Point2f center, bool Fkey, double duration)
 {
 
 	PlayableNote new_note;
@@ -130,11 +131,11 @@ PlayableNote Note::GetNewTone( Point2f center, bool Fkey)
 	float half_staves_removed =  (start_ /note_dist );
 
 	new_note.note_ID =  noteRemap(startKey + ((int)((int)half_staves_removed)) );//notes per octave
-	new_note.octave =highestOctave + (int)( start_/ (avg_staff_distance*4));
+//	new_note.octave =highestOctave + (int)( start_/ (avg_staff_distance*4));
 	new_note.bar_location = bar_location + (int)center.x;
-	new_note.duration = 1;
+	new_note.duration =duration;
 
-	cout<<"plabale note : @ "<<new_note.bar_location <<" center.y "<<center.y<<" id "<<new_note.note_ID<<" oc "<<	new_note.octave<<endl;
+	cout<<"plabale note : @ "<<new_note.bar_location <<" center.y "<<center.y<<" id "<<new_note.note_ID<<endl;
 
 	return new_note;
 

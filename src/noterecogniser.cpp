@@ -121,15 +121,48 @@ Mat NoteRecogniser::PreProcessData(const Mat &image,RotatedRect ellipse)
 	return erosion_dst.clone();
 }
 
+void NoteRecogniser::ConcatData(Mat &trainData, Mat &classifier, const string datafolder, float id){
+
+	vector<string> names = GetFileNames(datafolder);
+	Mat goodimg = imread(datafolder+names[2],0);
+	int dimension = trainImgDimension*trainImgDimension;
+	Mat data= GetDataVec(datafolder,names, dimension);
+
+	Mat new_classifier = Mat(data.rows,1,CV_32FC1,id);
+	if(trainData.empty())
+	{
+		data.copyTo(trainData);
+		new_classifier.copyTo(classifier);
+	}
+	else
+	{
+		vconcat(trainData,data.clone(), trainData);
+		vconcat(classifier,new_classifier.clone(), classifier);
+	}
+}
+
+
 
 KNearest NoteRecogniser::Train()
 {
+	int nrClasses = 3;
 	string goodDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\note\\";
 	string badDataLoc = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\notnote\\";
+	string quarter = "C:\\Users\\rjanszen\\workspace\\Readmusic\\traindata\\quarter\\";
+
+	string nameArr[nrClasses]={goodDataLoc,badDataLoc,quarter};
+//
+//	for( int i=0;i<nrClasses;i++)
+//	{
+//		ConcatData(Mat &trainData, Mat &classifier, const string datafolder, float id)
+//	}
+
 
 	vector<string> goodNames = GetFileNames(goodDataLoc);
 	vector<string> badNames = GetFileNames(badDataLoc);
-	Mat goodimg = imread(goodDataLoc+goodNames[2],0);
+//	vector<string> badNames = GetFileNames(badDataLoc);
+
+//	Mat goodimg = imread(goodDataLoc+goodNames[2],0);
 //	Mat badimg = imread(goodDataLoc+badNames[2],0);
 
 //	assert(goodimg.cols == badimg.cols && goodimg.rows == badimg.rows && goodimg.cols == goodimg.rows);
@@ -149,6 +182,7 @@ KNearest NoteRecogniser::Train()
 	vconcat(goodclass,badclass, trainClass);
 	trainImg.copyTo(TrainData);
 	trainClass.copyTo(TrainClassifier);
+
 	int K = 10;
 	TrainData.convertTo(TrainData,CV_32FC1);
 	KNearest newKNN(TrainData, TrainClassifier);

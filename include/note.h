@@ -44,7 +44,7 @@ private :
 	GetProjection calcProj;
 	bool saveTrainData;
 //	NoteRecogniser Identifier;
-	PlayableNote GetNewTone( Point2f center, bool Fkey);
+	PlayableNote GetNewTone( Point2f center, bool Fkey, double duration);
 	void OrderNotes(vector<PlayableNote>& input);
 	int bar_location;
 	Mat image;
