@@ -35,7 +35,7 @@ public:
 	}
 
 	vector<int> Xprojection; //along bar
-	vector<PlayableNote> FindGoodTones(int & dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey);
+	vector<PlayableNote> FindGoodTones(int & dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,   NoteRecogniser &recogniser, bool Fkey);
 	int X_median;
 	int X_avg;
 	//    int tone;

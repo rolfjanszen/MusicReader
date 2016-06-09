@@ -101,7 +101,8 @@ void AnalyseScore::FindPrevalantEllipse(Mat &sheet)
 void AnalyseScore::CreateBars(vector<int> &staves, Mat &sheet_img)
 {
 
-    while(staves.size()>=4){
+    while(staves.size()>=4)
+    {
 
         float bar_height= 30;//staves[4]-staves[0];
         float range=bar_height/1.5;
@@ -157,9 +158,12 @@ void AnalyseScore::SegmentNotes()
 void  AnalyseScore::IdNotes()
 {
 
-	int note_counter = 100;
+	int note_counter = 200;
 	NoteRecogniser Identifier;
-	Identifier.Train();
+//	Identifier.TrainSVM();
+//	waitKey();
+
+	Identifier.Train(ml_SVM);
 
 	for(vector<Bar>::iterator bar_it=bars.begin();bar_it != bars.end() ; bar_it++)
 	{
@@ -173,7 +177,6 @@ void  AnalyseScore::IdNotes()
 			bars[i].GetPlayableNotes(note_widht,note_height,note_counter, Identifier,Fkey);
 		}
 	}
-
 	cout<<"done ID notes"<<endl;
 }
 

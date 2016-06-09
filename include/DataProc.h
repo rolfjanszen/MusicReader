@@ -6,6 +6,7 @@
  */
 #include "essential.h"
 
+#include <dirent.h>
 #ifndef DATAPROC_H_
 #define DATAPROC_H_
 
@@ -17,6 +18,30 @@ public:
 	virtual ~DataProc(){};
 //	template<typename T>
 
+
+//	template<class T> vector<string> DataProc<T>::GetFileNames(string directory)
+//	vector<string> GetFileNames(string directory)
+//	{
+//
+//		DIR *dir;
+//		struct dirent *ent;
+//		vector<string> filenames;
+//
+//		if ((dir = opendir(directory.c_str())) != NULL) {
+//			/* print all the files and directories within directory */
+//			while ((ent = readdir(dir)) != NULL) {
+//				printf("%s\n", ent->d_name);
+//				filenames.push_back(ent->d_name);
+//			}
+//			closedir(dir);
+//		} else {
+//			/* could not open directory */
+//			perror("");
+//
+//		}
+//
+//		return filenames;
+//	}
 	 T CalcMedian(const vector<T> &data_set)
 	 {
 	    int median_=0;

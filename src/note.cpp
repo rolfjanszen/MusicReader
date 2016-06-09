@@ -25,12 +25,13 @@ void Note::OrderNotes(vector<PlayableNote>& input)
 	}
 }
 
-vector<PlayableNote> Note::FindGoodTones(int &dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,  NoteRecogniser &recogniser, bool Fkey)
+vector<PlayableNote> Note::FindGoodTones(int &dataCount, double tresh, int med_dimension_ratio, int med_note_widht, int med_note_height,   NoteRecogniser &recogniser, bool Fkey)
 {
 	//TODO Move to notes
 	Mat segment_cpy;
 	Mat threshold_output;
-Mat bluredImage;
+	Mat bluredImage;
+
 	image.copyTo(segment_cpy);
 	blur( segment_cpy, bluredImage, Size(3,3) );
 	threshold(bluredImage, threshold_output, 60, 255, THRESH_BINARY);
@@ -69,13 +70,8 @@ Mat bluredImage;
 
 					circle(cpy,Point((int)ellipses[i].center.x,(int)ellipses[i].center.y), 5, Scalar(20,20,20) );
 
-
-
 					foundnotes.push_back(foundNote);
-
 					cout<<"ided note "<<endl;
-
-
 				}
 
 			}
@@ -85,11 +81,11 @@ Mat bluredImage;
 
 					destroyWindow("detected");
 
-			waitKey();
+//			waitKey();
 		}
 	}
 
-	if(foundnotes.size()>1)
+	if(foundnotes.size() > 1)
 		OrderNotes(foundnotes);
 	///
 	return foundnotes;

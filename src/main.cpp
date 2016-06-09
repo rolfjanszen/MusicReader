@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 {
 	AnalyseScore analyze;
 
-	Mat sheetmusic=imread("C:\\Users\\rjanszen\\Documents\\vaderjacob.png",0);
+	Mat sheetmusic=imread("marylamb.jpg",0);
 
    vector<Bar> playbar = analyze.Run(sheetmusic);
 
